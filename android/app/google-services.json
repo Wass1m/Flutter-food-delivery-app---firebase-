@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "295812779531",
+    "firebase_url": "https://crwn-db-7a776.firebaseio.com",
+    "project_id": "crwn-db-7a776",
+    "storage_bucket": "crwn-db-7a776.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295812779531:android:b95c9d4362d6d98186410e",
+        "android_client_info": {
+          "package_name": "co.appbrewery.flash_chat_onetik_0"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW9rXt-z5CQ2yyBXoIPePLMssyvPZY0Wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295812779531:android:a60b1e597c1bb2ff86410e",
+        "android_client_info": {
+          "package_name": "com.example.food_order"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW9rXt-z5CQ2yyBXoIPePLMssyvPZY0Wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295812779531:android:ca10ac7640da6b0086410e",
+        "android_client_info": {
+          "package_name": "com.example.upwork_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW9rXt-z5CQ2yyBXoIPePLMssyvPZY0Wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295812779531-c5dppp9h1or4jov41nn2goh10qbn7prp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
