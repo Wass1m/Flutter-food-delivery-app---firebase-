@@ -1,10 +1,10 @@
 class Food {
-  final FoodType type;
+  final String type;
   final String name;
   final int price;
-  final String size;
   final int weight;
   final int calories;
+  final List<String> size;
   final bool outOfStock = false;
 
   Food({
