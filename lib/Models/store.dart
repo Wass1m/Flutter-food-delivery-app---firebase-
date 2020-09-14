@@ -8,12 +8,15 @@ class Store {
   final int rating;
   final String location;
   final String brand;
+  final List<dynamic> foodTypes;
 
-  Store(
-      {this.name,
-      this.menu,
-      this.image,
-      this.rating,
-      this.location,
-      this.brand});
+  Store({
+    this.name,
+    this.menu,
+    this.image,
+    this.rating,
+    this.location,
+    this.brand,
+    this.foodTypes,
+  });
 }

@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:food_order/Models/Brand.dart';
+import 'package:food_order/Models/food.dart';
 import 'package:food_order/Models/profile.dart';
 import 'package:food_order/Models/store.dart';
 
@@ -14,13 +17,14 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('food-store');
   final CollectionReference brandsCollection =
       FirebaseFirestore.instance.collection('brands');
+  final CollectionReference typesCollection =
+      FirebaseFirestore.instance.collection('foodTypes');
+  final CollectionReference foodCollection =
+      FirebaseFirestore.instance.collection('food');
 
   DatabaseService({this.uid});
 
   Profile _profileFromFirebaseUser(DocumentSnapshot snapshot) {
-    print('snapshot');
-    print(snapshot.data());
-
     return snapshot.data() == null
         ? null
         : Profile(
@@ -46,6 +50,7 @@ class DatabaseService {
   //   );
   // }
 
+// create a new profile
   Future createProfile(
       String firstName, String lastName, String address) async {
     return await profileCollection.doc(uid).set({
@@ -56,6 +61,7 @@ class DatabaseService {
     });
   }
 
+// get stores
   List<Store> _storeFromFirebase(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       // print(doc.data());
@@ -66,11 +72,58 @@ class DatabaseService {
         rating: doc.data()['rating'] ?? 0,
         menu: doc.data()['menu'] ?? '',
         image: doc.data()['image'] ?? '',
+        foodTypes: doc.data()['foodTypes'] ?? [''],
       );
     }).toList();
   }
 
-  Stream<List<Store>> get stores {
-    return storeCollection.snapshots().map(_storeFromFirebase);
+  // Stream<List<Store>> get stores {
+  //   return storeCollection.snapshots().map(_storeFromFirebase);
+  // }
+
+  Stream<List<Store>> getFilteredStores({String filter = 'All'}) {
+    if (filter == 'All') {
+      return storeCollection.snapshots().map(_storeFromFirebase);
+    }
+    return storeCollection
+        .where("foodTypes", arrayContains: filter)
+        .snapshots()
+        .map(_storeFromFirebase);
+  }
+
+  List<FoodType> _typesFromFirebase(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return FoodType(
+        name: doc.data()['name'] ?? '',
+        image: doc.data()['image'] ?? '',
+      );
+    }).toList();
+  }
+
+  Stream<List<FoodType>> get allTypes {
+    return typesCollection.snapshots().map(_typesFromFirebase);
+  }
+
+  List<Food> _foodFromFirebase(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return Food(
+        name: doc.data()['name'] ?? '',
+        image: doc.data()['image'] ?? '',
+        type: doc.data()['type'] ?? '',
+        price: doc.data()['price'] ?? 0,
+        size: doc.data()['size'] ?? [''],
+        weight: doc.data()['weight'] ?? 0,
+        calories: doc.data()['calories'] ?? 0,
+      );
+    }).toList();
+  }
+
+  Stream<List<Food>> getfoodList(List<String> foods) {
+    var list = List<String>.from(foods);
+    print(list);
+    return foodCollection
+        .where(FieldPath.documentId, whereIn: list)
+        .snapshots()
+        .map(_foodFromFirebase);
   }
 }

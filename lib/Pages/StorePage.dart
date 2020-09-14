@@ -2,42 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:food_order/Models/food.dart';
 import 'package:food_order/Models/profile.dart';
 import 'package:food_order/Models/store.dart';
-import 'package:food_order/Pages/StorePage.dart';
 import 'package:food_order/Screens/ProfileScreen.dart';
 import 'package:food_order/Utils/FirebaseAuth.dart';
 import 'package:food_order/Utils/database.dart';
 import 'package:food_order/styleGuide.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class StorePage extends StatefulWidget {
+  final Store store;
+
+  const StorePage({Key key, this.store}) : super(key: key);
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _StorePageState createState() => _StorePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _StorePageState extends State<StorePage> {
   final AuthService _auth = AuthService();
   final DatabaseService _database = DatabaseService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String filter = 'All';
-  void setFilter(String newFilter) {
-    this.setState(() {
-      filter = newFilter;
-    });
-    DatabaseService().getFilteredStores(filter: filter);
-  }
 
-  int isSelected = 0;
   @override
   Widget build(BuildContext context) {
-    final profile = Provider.of<Profile>(context);
     return MultiProvider(
       providers: [
-        StreamProvider<List<Store>>.value(
-          value: DatabaseService().getFilteredStores(filter: filter),
+        StreamProvider<List<Food>>.value(
+          value: DatabaseService()
+              .getfoodList(widget.store.menu.cast<String>().toList()),
         ),
-        StreamProvider<List<FoodType>>.value(
-          value: DatabaseService().allTypes,
-        )
+        // StreamProvider<List<FoodType>>.value(
+        //   value: DatabaseService().allTypes,
+        // )
       ],
       child: Scaffold(
         key: _scaffoldKey,
@@ -74,10 +68,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      '${profile.firstName} ${profile.lastName}',
-                      style: ktextStyle,
-                    )
+                    // Text(
+                    //   '${profile.firstName} ${profile.lastName}',
+                    //   style: ktextStyle,
+                    // )
                   ],
                 ),
               ),
@@ -131,10 +125,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Hello, ${profile.firstName}',
-                      style: kheadTextStyle,
-                    ),
+                    // Text(
+                    //   'Hello, ${profile.firstName}',
+                    //   style: kheadTextStyle,
+                    // ),
                     InkWell(
                       onTap: () {
                         _scaffoldKey.currentState.openDrawer();
@@ -159,9 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     RichText(
                       text: TextSpan(children: [
-                        TextSpan(text: 'Find your', style: kheadTextStyleLight),
+                        TextSpan(
+                            text: 'Choose what', style: kheadTextStyleLight),
                         TextSpan(text: '\n'),
-                        TextSpan(text: 'Favorite Food', style: kheadTextStyle),
+                        TextSpan(
+                            text: 'You want to eat', style: kheadTextStyle),
                       ]),
                     ),
                     Material(
@@ -181,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                FoodTypesList(setF: setFilter),
+                // FoodTypesList(setF: setFilter),
                 SizedBox(
                   height: 20,
                 ),
@@ -287,8 +283,8 @@ class StoreList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stores = Provider.of<List<Store>>(context);
-    print('store provider');
+    final stores = Provider.of<List<Food>>(context);
+
     print(stores);
     return stores == null
         ? CircularProgressIndicator(
@@ -305,12 +301,7 @@ class StoreList extends StatelessWidget {
                         horizontal: 12, vertical: 10),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StorePage(
-                                      store: stores[index],
-                                    )));
+                        print(stores[index].name);
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -332,17 +323,20 @@ class StoreList extends StatelessWidget {
                             Container(
                                 height: 100,
                                 width: 100,
-                                child: Image.network(stores[index].image)),
+                                child: Image.network(
+                                  stores[index].image,
+                                  fit: BoxFit.cover,
+                                )),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text('${stores[index].rating.toString()} ⭐'),
+                                Text('${stores[index].price.toString()} \$'),
                                 Text(
                                   stores[index].name,
                                   style: ktextStyle,
                                 ),
-                                Text(stores[index].foodTypes[0]),
+                                Text(stores[index].size[0]),
                               ],
                             )
                           ],
