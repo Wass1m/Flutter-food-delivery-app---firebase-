@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:food_order/Models/cart.dart';
 import 'package:food_order/Models/user.dart';
 import 'package:food_order/Screens/WelcomeScreen.dart';
 import 'package:food_order/Screens/Wrapper.dart';
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
         StreamProvider<CustomUser>.value(
           value: AuthService().user,
         ),
+        ChangeNotifierProvider<CartProvider>(
+          create: (context) => CartProvider(),
+        )
       ],
       child: MaterialApp(
         home: Wrapper(),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:food_order/Models/cart.dart';
 import 'package:food_order/Models/food.dart';
 import 'package:food_order/Models/profile.dart';
 import 'package:food_order/Models/store.dart';
+import 'package:food_order/Pages/CartPage.dart';
+import 'package:food_order/Pages/DetailFood.dart';
 import 'package:food_order/Screens/ProfileScreen.dart';
 import 'package:food_order/Utils/FirebaseAuth.dart';
 import 'package:food_order/Utils/database.dart';
@@ -95,7 +98,8 @@ class _StorePageState extends State<StorePage> {
                     ),
                     FlatButton(
                       onPressed: () async {
-                        await _auth.signOut();
+                        Provider.of<CartProvider>(context, listen: false)
+                            .reset();
                       },
                       child: Text('Settings'),
                     ),
@@ -125,10 +129,41 @@ class _StorePageState extends State<StorePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Text(
-                    //   'Hello, ${profile.firstName}',
-                    //   style: kheadTextStyle,
-                    // ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: kprimaryColor,
+                          child: Icon(
+                            Icons.home,
+                            size: 40,
+                            color: Colors.white,
+                          )),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CartPage()));
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_cart,
+                            color: Colors.black,
+                          ),
+                          CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 10,
+                            child: Text(
+                                '${Provider.of<CartProvider>(context).itemsNumber()}'),
+                          )
+                        ],
+                      ),
+                    ),
                     InkWell(
                       onTap: () {
                         _scaffoldKey.currentState.openDrawer();
@@ -146,7 +181,7 @@ class _StorePageState extends State<StorePage> {
                   ],
                 ),
                 SizedBox(
-                  height: 50,
+                  height: 20,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,11 +212,37 @@ class _StorePageState extends State<StorePage> {
                 SizedBox(
                   height: 20,
                 ),
-                // FoodTypesList(setF: setFilter),
-                SizedBox(
-                  height: 20,
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 2,
+                          offset: Offset(0, 0.2),
+                          color: Colors.black),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Image.network(
+                        widget.store.image,
+                        height: 50,
+                        width: 50,
+                      ),
+                      Text(
+                        widget.store.name,
+                        style: kSubHeadTextStyle,
+                      )
+                    ],
+                  ),
                 ),
-                StoreList(),
+                SizedBox(
+                  height: 30,
+                ),
+                FoodList(),
               ],
             ),
           ),
@@ -276,17 +337,17 @@ class _FoodTypesListState extends State<FoodTypesList> {
   }
 }
 
-class StoreList extends StatelessWidget {
-  const StoreList({
+class FoodList extends StatelessWidget {
+  const FoodList({
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final stores = Provider.of<List<Food>>(context);
+    final foodList = Provider.of<List<Food>>(context);
 
-    print(stores);
-    return stores == null
+    print(foodList);
+    return foodList == null
         ? CircularProgressIndicator(
             backgroundColor: kprimaryColor,
             strokeWidth: 2,
@@ -294,14 +355,21 @@ class StoreList extends StatelessWidget {
         : Container(
             height: 300,
             child: ListView.builder(
-                itemCount: stores.length,
+                itemCount: foodList.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 10),
                     child: GestureDetector(
                       onTap: () {
-                        print(stores[index].name);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailFood(
+                              food: foodList[index],
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -318,25 +386,49 @@ class StoreList extends StatelessWidget {
                         ),
                         height: 140,
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Container(
                                 height: 100,
                                 width: 100,
                                 child: Image.network(
-                                  stores[index].image,
+                                  foodList[index].image,
                                   fit: BoxFit.cover,
                                 )),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text('${stores[index].price.toString()} \$'),
+                                Text('${foodList[index].price.toString()} \$'),
                                 Text(
-                                  stores[index].name,
+                                  foodList[index].name,
                                   style: ktextStyle,
                                 ),
-                                Text(stores[index].size[0]),
+                                Row(
+                                  children: foodList[index]
+                                      .size
+                                      .map((element) => Text('$element '))
+                                      .toList(),
+                                )
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      color: kprimaryColor,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: InkWell(
+                                    onTap: () {},
+                                    child: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
                               ],
                             )
                           ],

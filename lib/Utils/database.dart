@@ -1,14 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:food_order/Models/Brand.dart';
 import 'package:food_order/Models/food.dart';
 import 'package:food_order/Models/profile.dart';
 import 'package:food_order/Models/store.dart';
+import 'package:provider/provider.dart';
 
-class DatabaseService {
+class DatabaseService extends ChangeNotifier {
   final String uid;
-
+  bool loading = false;
   // collection reference;
 
   final CollectionReference profileCollection =
@@ -41,6 +43,33 @@ class DatabaseService {
     return profileCollection.doc(uid).snapshots().map(_profileFromFirebaseUser);
   }
 
+// create a new profile
+  Future updateProfile(String address) async {
+    return await profileCollection.doc(uid).update({'address': address});
+  }
+
+  Food _foodByIdFromFirebase(DocumentSnapshot doc) {
+    return doc.data() == null
+        ? null
+        : Food(
+            foodID: doc.id,
+            name: doc.data()['name'] ?? '',
+            image: doc.data()['image'] ?? '',
+            type: doc.data()['type'] ?? '',
+            price: doc.data()['price'] ?? 0,
+            size: doc.data()['size'] ?? [''],
+            weight: doc.data()['weight'] ?? 0,
+            calories: doc.data()['calories'] ?? 0,
+          );
+  }
+
+  Future<Food> getFoodById(id) {
+    return foodCollection
+        .doc(id)
+        .get()
+        .then((doc) => _foodByIdFromFirebase(doc));
+  }
+
 // Create profile;
 
   // Brand _brandFromFirebase(DocumentSnapshot snapshot) {
@@ -66,6 +95,7 @@ class DatabaseService {
     return snapshot.docs.map((doc) {
       // print(doc.data());
       return Store(
+        storeID: doc.id,
         brand: doc.data()['brand'] ?? '',
         name: doc.data()['name'] ?? '',
         location: doc.data()['location'] ?? '',
@@ -107,6 +137,7 @@ class DatabaseService {
   List<Food> _foodFromFirebase(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       return Food(
+        foodID: doc.id,
         name: doc.data()['name'] ?? '',
         image: doc.data()['image'] ?? '',
         type: doc.data()['type'] ?? '',
@@ -126,4 +157,9 @@ class DatabaseService {
         .snapshots()
         .map(_foodFromFirebase);
   }
+
+  // void setLoading(bool value) {
+  //   loading = value;
+  //   notifyListeners();
+  // }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:food_order/Models/cart.dart';
 import 'package:food_order/Models/food.dart';
 import 'package:food_order/Models/profile.dart';
 import 'package:food_order/Models/store.dart';
+import 'package:food_order/Pages/CartPage.dart';
 import 'package:food_order/Pages/StorePage.dart';
 import 'package:food_order/Screens/ProfileScreen.dart';
 import 'package:food_order/Utils/FirebaseAuth.dart';
@@ -19,11 +21,25 @@ class _HomeScreenState extends State<HomeScreen> {
   final DatabaseService _database = DatabaseService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String filter = 'All';
+  bool loading = false;
+  void setLoading(bool value) {
+    setState(() {
+      loading = value;
+    });
+  }
+
   void setFilter(String newFilter) {
     this.setState(() {
       filter = newFilter;
     });
-    DatabaseService().getFilteredStores(filter: filter);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Provider.of<CartProvider>(context, listen: false).loadSharedPrefs();
+    });
   }
 
   int isSelected = 0;
@@ -153,6 +169,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(
                   height: 50,
+                  child: Center(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CartPage()));
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_cart,
+                            color: Colors.black,
+                          ),
+                          CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 10,
+                            child: Text(
+                                '${Provider.of<CartProvider>(context).itemsNumber()}'),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,11 +221,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                FoodTypesList(setF: setFilter),
+                FoodTypesList(
+                  setF: setFilter,
+                  setLoading: setLoading,
+                  loading: loading,
+                ),
                 SizedBox(
                   height: 20,
                 ),
-                StoreList(),
+                StoreList(
+                  loading: loading,
+                ),
               ],
             ),
           ),
@@ -199,9 +245,13 @@ class FoodTypesList extends StatefulWidget {
   const FoodTypesList({
     Key key,
     @required this.setF,
+    this.loading,
+    this.setLoading,
   }) : super(key: key);
 
   final Function setF;
+  final bool loading;
+  final Function setLoading;
 
   @override
   _FoodTypesListState createState() => _FoodTypesListState();
@@ -281,13 +331,17 @@ class _FoodTypesListState extends State<FoodTypesList> {
 }
 
 class StoreList extends StatelessWidget {
+  final bool loading;
+
   const StoreList({
     Key key,
+    this.loading,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final stores = Provider.of<List<Store>>(context);
+
     print('store provider');
     print(stores);
     return stores == null

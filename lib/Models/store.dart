@@ -2,6 +2,7 @@ import 'package:food_order/Models/Brand.dart';
 import 'package:food_order/Models/food.dart';
 
 class Store {
+  final String storeID;
   final String name;
   final List<dynamic> menu;
   final String image;
@@ -11,6 +12,7 @@ class Store {
   final List<dynamic> foodTypes;
 
   Store({
+    this.storeID,
     this.name,
     this.menu,
     this.image,
